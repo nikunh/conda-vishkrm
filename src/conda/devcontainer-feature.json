@@ -1,10 +1,12 @@
 {
   "id": "conda",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "Miniconda",
   "description": "Installs Miniconda (Python package manager).",
   "documentationURL": "https://github.com/nikunh/conda-vishkrm",
   "licenseURL": "https://github.com/nikunh/conda-vishkrm/blob/main/LICENSE",
   "options": {},
-  "installsAfter": ["ghcr.io/nikunh/001-dev-packages-vishkrm/001-dev-packages"]
+  "installsAfter": [
+    "ghcr.io/nikunh/001-dev-packages-vishkrm/001-dev-packages"
+  ]
 }
