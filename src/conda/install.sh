@@ -1,9 +1,11 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 set -e
 
-# Get username from environment or default to babaji
-USERNAME=${USERNAME:-"babaji"}
-USER_HOME="/home/${USERNAME}"
+# Audit fix 2026-05-15: resolve runtime user/home/group dynamically (no hardcoded babaji)
+USERNAME="${USERNAME:-${_REMOTE_USER:-vishkrm}}"
+USER_HOME="$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)"
+[ -z "$USER_HOME" ] && USER_HOME="/home/${USERNAME}"
+USER_GROUP="$(id -gn "$USERNAME" 2>/dev/null || echo users)"
 
 # Install Miniconda if not already available via the official DevContainer feature
 # This feature supplements the official conda feature with proper PATH setup
@@ -27,7 +29,7 @@ if ! command -v conda &> /dev/null; then
     
     # Fix ownership if needed
     if [ "$USER" != "$USERNAME" ]; then
-        chown -R ${USERNAME}:${USERNAME} "$USER_HOME/miniconda" 2>/dev/null || chown -R ${USERNAME}:users "$USER_HOME/miniconda" 2>/dev/null || true
+        chown -R "${USERNAME}:${USER_GROUP}" "$USER_HOME/miniconda" 2>/dev/null || true
     fi
 fi
 
@@ -104,14 +106,14 @@ EOF
     if [ -d "$USER_HOME/.ohmyzsh_source_load_scripts" ]; then
         cp "$fragment_source_file" "$fragment_file_user"
         if [ "$USER" != "$USERNAME" ]; then
-            chown ${USERNAME}:${USERNAME} "$fragment_file_user" 2>/dev/null || chown ${USERNAME}:users "$fragment_file_user" 2>/dev/null || true
+            chown "${USERNAME}:${USER_GROUP}" "$fragment_file_user" 2>/dev/null || true
         fi
     elif [ -d "$USER_HOME" ]; then
         # Create the directory if it doesn't exist
         mkdir -p "$USER_HOME/.ohmyzsh_source_load_scripts"
         cp "$fragment_source_file" "$fragment_file_user"
         if [ "$USER" != "$USERNAME" ]; then
-            chown -R ${USERNAME}:${USERNAME} "$USER_HOME/.ohmyzsh_source_load_scripts" 2>/dev/null || chown -R ${USERNAME}:users "$USER_HOME/.ohmyzsh_source_load_scripts" 2>/dev/null || true
+            chown -R "${USERNAME}:${USER_GROUP}" "$USER_HOME/.ohmyzsh_source_load_scripts" 2>/dev/null || true
         fi
     fi
     
