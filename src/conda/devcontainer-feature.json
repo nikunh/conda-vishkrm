@@ -1,6 +1,6 @@
 {
   "id": "conda",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "Miniconda",
   "description": "Installs Miniconda (Python package manager).",
   "documentationURL": "https://github.com/nikunh/conda-vishkrm",
