@@ -2,7 +2,14 @@
 set -e
 
 # Audit fix 2026-05-15: resolve runtime user/home/group dynamically (no hardcoded babaji)
-USERNAME="${USERNAME:-${_REMOTE_USER:-vishkrm}}"
+USERNAME="${USERNAME:-${_REMOTE_USER:-}}"
+if [ -z "$USERNAME" ] || [ "$USERNAME" = "root" ]; then
+    if getent passwd vishkrm >/dev/null 2>&1; then
+        USERNAME=vishkrm
+    else
+        USERNAME=$(getent passwd | awk -F: '$3>=1000 && $1!="nobody" {print $1; exit}')
+    fi
+fi
 USER_HOME="$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)"
 [ -z "$USER_HOME" ] && USER_HOME="/home/${USERNAME}"
 USER_GROUP="$(id -gn "$USERNAME" 2>/dev/null || echo users)"
